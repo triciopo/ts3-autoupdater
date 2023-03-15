@@ -5,7 +5,7 @@ trap \
   "{ cleanup ;}" \
   SIGINT SIGTERM ERR EXIT
 
-function cleanup() { if [[ -d $tmpdir ]]; then rm -rf $tmpdir; fi; }
+function cleanup() { if [[ -d $tmpdir ]]; then rm -rf "$tmpdir"; fi; }
 
 #---- Get newest ts3 server download url 
 function getURL() {
@@ -44,12 +44,12 @@ function update() {
     mkdir backups
   fi
   #Backup folder
-  tar --exclude='backups' --overwrite -cf backups/$(date +%F).tar *
+  tar --exclude='backups' --overwrite -cf backups/"$(date +%F)".tar -- *
   # Download and install new update
   tmpdir=$(mktemp -d /tmp/ts3auto.XXXXX)
-  curl -Ls $url -o $tmpdir/ts3.tar.bz2 
-  tar -xf $tmpdir/ts3.tar.bz2 -C $tmpdir
-  cp -a $tmpdir/teamspeak3-server_linux_amd64/. .
+  curl -Ls "$url" -o "$tmpdir"/ts3.tar.bz2 
+  tar -xf "$tmpdir"/ts3.tar.bz2 -C "$tmpdir"
+  cp -a "$tmpdir"/teamspeak3-server_linux_amd64/. .
   printf "[%s] Update complete. Backup saved on: $(pwd)/backup\n" "$(date +%c)"
 }
 
