@@ -26,9 +26,9 @@ function getURL() {
   if uname -m | grep '64'; then
     url="https://files.teamspeak-services.com/releases/server/$version/teamspeak3-server_linux_amd64-$version.tar.bz2"
   else
-	url="https://files.teamspeak-services.com/releases/server/$version/teamspeak3-server_linux_x86-$version.tar.bz2"
+    url="https://files.teamspeak-services.com/releases/server/$version/teamspeak3-server_linux_x86-$version.tar.bz2"
   fi
-	update
+    update
 }
 
 #---- Check for updates
@@ -43,10 +43,10 @@ function check() {
         ;;
       1)
         printf "[%s] New version $version found. Updating...\n" "$(date +%c)"
-    	  getURL
+    	getURL
         ;;
       *)
-    	  exit 1 ;;
+        exit 1 ;;
       esac
   else
     printf "[%s] Could not find current server version.\n" "$(date +%c)" >&2
