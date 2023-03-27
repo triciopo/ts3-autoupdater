@@ -2,12 +2,12 @@
 #
 # ts3-autoupdater - A simple bash script to auto-update a TeamSpeak Server.
 #
-# Usage: ./update.sh [-d SERVER_DIR] [-b BACKUP_DIR]
+# Usage: ./update.sh [-h] [-d SERVER_DIR] [-b BACKUP_DIR]
 #
 # Options:
-# -d SERVER_DIR -> Specify the server directory. Default: script's directory.
-# -b BACKUP_DIR  -> Specify the backup folder. Default: script's directory/backups.
-#
+# -h, --help -> Show help message and exit.
+# -d, --directory SERVER_DIR -> Specify the server directory. Default: script's directory.
+# -b, --backup BACKUP_DIR  -> Specify the backup folder. Default: script's directory/backups.
 
 [[ -v debug ]] && set -x
 
@@ -49,7 +49,7 @@ function check() {
         exit 1 ;;
       esac
   else
-    printf "[%s] Could not find current server version.\n" "$(date +%c)" >&2
+    printf "[%s] ERROR: Could not find current server version.\n" "$(date +%c)" >&2
     exit 1
   fi
 }
@@ -75,17 +75,54 @@ function update() {
   printf "[%s] Update complete. Backup saved on: $backup_dir\n" "$(date +%c)"
 }
 
-# Options
-while getopts ":d:b:" opt; do
-  case $opt in
-    d)
-      server_dir=$(realpath "$OPTARG")
-      if [[ ! -d $server_dir ]]; then
-        printf "[%s] Could not find working folder.\n" "$(date +%c)" >&2 && exit 1 
-      fi ;;
-    b) backup_dir="$OPTARG" ;;
-    *) printf "[%s] Invalid argument -%s\n" "$(date +%c)" "$OPTARG" >&2 && exit 1 ;;
+#---- Show help
+function help() {
+  cat << EOF
+Usage: $(basename "$0") [-h] [-d SERVER_DIR] [-b BACKUP_DIR]
+
+Options:
+-h, --help                   Show this help message and exit.
+-d, --directory              Specify the server directory. 
+-b, --backup                 Specify the backup directory
+EOF
+}
+
+#---- Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -h|--help)
+      help
+      exit 0
+      ;;
+    -d|--directory)
+      if [[ $# -lt 2 ]]; then
+        printf "ERROR: Missing argument for %s\n" "$1" >&2
+        help
+        exit 1
+      fi
+      server_dir="$2"
+      if [[ ! -d "$server_dir" ]]; then
+        printf "ERROR: Could not find server directory.\n" >&2
+        exit 1
+      fi
+      shift
+      ;;
+    -b|--backup)
+      if [[ $# -lt 2 ]]; then
+        printf "ERROR: Missing argument for %s\n" "$1" >&2
+        help
+        exit 1
+      fi
+      backup_dir="$2"
+      shift
+      ;;
+    *)
+      printf "ERROR: Invalid option %s\n" "$1" >&2
+      help
+      exit 1
+      ;;
   esac
+  shift
 done
 
 check
